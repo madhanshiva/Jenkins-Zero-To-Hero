@@ -20,6 +20,7 @@ pipeline {
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         echo 'Build Docker Image'
                         docker build -t madhanshiva/cicd-e2e:${BUILD_NUMBER} .
+                        docker tag madhanshiva/cicd-e2e:${BUILD_NUMBER} mvmadhan/cicd-e2e:${BUILD_NUMBER}
                         '''
                     }
                 }
@@ -33,7 +34,6 @@ pipeline {
                         sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         echo 'Push to Repo'
-                        docker tag madhanshiva/cicd-e2e:${BUILD_NUMBER} mvmadhan/cicd-e2e:${BUILD_NUMBER}
                         docker push mvmadhan/cicd-e2e:${BUILD_NUMBER}
                         '''
                     }
