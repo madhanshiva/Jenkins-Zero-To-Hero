@@ -33,6 +33,7 @@ pipeline {
                         sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                         echo 'Push to Repo'
+                        docker tag madhanshiva/cicd-e2e:${BUILD_NUMBER} mvmadhan/cicd-e2e:${BUILD_NUMBER}
                         docker push madhanshiva/cicd-e2e:${BUILD_NUMBER}
                         '''
                     }
