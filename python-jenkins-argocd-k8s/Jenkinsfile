@@ -52,6 +52,10 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'github-push-credentials', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
                         cd deploy
+                        if [ $? -ne 0 ]; then
+                            echo "Deploy directory not found!"
+                            exit 1
+                        fi
                         cat deploy.yaml
                         sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
                         cat deploy.yaml
