@@ -52,11 +52,20 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: '1beef06e-952e-4633-a1a7-a641483784ac', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
                         cd deploy
+                        echo "Current deploy.yaml content:"
                         cat deploy.yaml
+                        echo "Build number: ${BUILD_NUMBER}"
+                        
+                        # Run sed command to replace the image version
                         sed -i 's/32/${BUILD_NUMBER}/g' deploy.yaml
+                        
+                        echo "Updated deploy.yaml content:"
                         cat deploy.yaml
+                        
+                        # Check git status and commit changes
+                        git status
                         git add deploy.yaml
-                        git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
+                        git commit -m 'Updated the deploy yaml | Jenkins Pipeline' || echo "No changes to commit"
                         git remote -v
                         git push https://github.com/madhanshiva/cicd-demo-manifests-repo.git HEAD:main
                         '''
