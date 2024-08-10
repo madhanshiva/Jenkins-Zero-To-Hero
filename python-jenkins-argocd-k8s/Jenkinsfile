@@ -46,42 +46,40 @@ pipeline {
             }
         }
         
-        stage('Update K8S manifest & push to Repo') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: '1beef06e-952e-4633-a1a7-a641483784ac', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh '''
-                        # List files and check current git status
-                        ls -al deploy
-                        git status
+       stage('Update K8S manifest & push to Repo') {
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: '1beef06e-952e-4633-a1a7-a641483784ac', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                sh '''
+                # List files and check current git status
+                ls -al deploy
+                git status
 
-                        # Check if deploy.yaml exists
-                        if [ -f deploy/deploy.yaml ]; then
-                            echo "Current deploy.yaml content:"
-                            cat deploy/deploy.yaml
-                            
-                            # Perform the update
-                            sed -i "s/madhanshiva\/cicd-e2e/mvmadhan\/cicd-e2e/g" deploy/deploy.yaml
-                            sed -i "s/32/${BUILD_NUMBER}/g" deploy/deploy.yaml
-                            
-                            # Verify the update
-                            echo "Updated deploy.yaml content:"
-                            cat deploy/deploy.yaml
+                # Check if deploy.yaml exists
+                if [ -f deploy/deploy.yaml ]; then
+                    echo "Current deploy.yaml content:"
+                    cat deploy/deploy.yaml
+                    
+                    # Replace the image name and update the version
+                    sed -i 's/madhanshiva\/cicd-e2e/mvmadhan\/cicd-e2e/g' deploy/deploy.yaml
+                    sed -i 's/32/${BUILD_NUMBER}/g' deploy/deploy.yaml
+                    
+                    # Verify the update
+                    echo "Updated deploy.yaml content:"
+                    cat deploy/deploy.yaml
 
-                            # Check git status and perform commit
-                            cd deploy
-                            git status
-                            git add deploy.yaml
-                            git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
-                            git remote -v
-                            git push https://github.com/madhanshiva/cicd-end-to-end.git HEAD:main
-                        else
-                            echo "deploy.yaml not found in deploy directory"
-                            exit 1
-                        fi
-                        '''
-                    }
-                }
+                    # Check git status and perform commit
+                    cd deploy
+                    git status
+                    git add deploy.yaml
+                    git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
+                    git remote -v
+                    git push https://github.com/madhanshiva/cicd-end-to-end.git HEAD:main
+                else
+                    echo "deploy.yaml not found in deploy directory"
+                    exit 1
+                fi
+                '''
             }
         }
     }
