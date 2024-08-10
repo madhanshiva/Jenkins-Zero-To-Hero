@@ -55,6 +55,15 @@ pipeline {
                         cat deploy.yaml
                         sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
                         cat deploy.yaml
+
+                        # Configure Git with correct credentials
+                        git config user.name "Your Name"
+                        git config user.email "your.email@example.com"
+
+                        # Pull remote changes
+                        git pull origin main --rebase
+
+                        # Add, commit, and push changes
                         git add deploy.yaml
                         git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
                         git remote set-url origin https://$GIT_USERNAME:$GIT_TOKEN@github.com/madhanshiva/cicd-demo-manifests-repo.git
