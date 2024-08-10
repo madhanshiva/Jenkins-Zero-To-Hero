@@ -15,16 +15,18 @@ pipeline {
         }
 
         stage('Build Docker'){
-            steps{
-                script{
-                    sh '''
-                    echo 'Buid Docker Image'
-                    docker build -t madhanshiva/cicd-e2e:${BUILD_NUMBER} .
-                    '''
-                }
+    steps{
+        script{
+            withCredentials([usernamePassword(credentialsId: 'docker_id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                sh '''
+                echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                echo 'Build Docker Image'
+                docker build -t madhanshiva/cicd-e2e:${BUILD_NUMBER} .
+                '''
             }
         }
-
+    }
+}
         stage('Push the artifacts'){
            steps{
                 script{
