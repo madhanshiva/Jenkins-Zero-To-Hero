@@ -64,6 +64,7 @@ pipeline {
                 
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
+                cd deploy
                 git add deploy.yaml
                 git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
                 git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
