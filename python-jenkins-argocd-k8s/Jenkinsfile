@@ -77,15 +77,15 @@ pipeline {
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
                 git pull origin main
-                cd deploy
+                
                 pwd
                 ls
-                git add deploy.yaml
+                git add deploy/deploy.yaml
                 git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
                 git remote -v
                 git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
                 git fetch origin
-                git rebase origin/main 
+                 
                 pwd
                 ls
                 git push origin main 
