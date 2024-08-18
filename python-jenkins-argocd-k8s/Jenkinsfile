@@ -71,8 +71,9 @@ pipeline {
                 git remote -v
                 git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
                 git fetch origin
-                git rebase origin/main || true
-                git push origin main || true
+                git rebase origin/main 
+                git config --global --add safe.directory /var/lib/jenkins/workspace/new
+                git push origin main 
                 '''
                  }
                 }
