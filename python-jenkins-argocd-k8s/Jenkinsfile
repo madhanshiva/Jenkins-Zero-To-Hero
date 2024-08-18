@@ -50,7 +50,7 @@ pipeline {
         stage('Update K8S manifest & push to Repo') {
     steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'your-git-credentials-id', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+            withCredentials([usernamePassword(credentialsId: 'github-push-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                 // Change directory to deploy
                 sh 'cd deploy'
 
