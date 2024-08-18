@@ -76,6 +76,10 @@ pipeline {
                 
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
+                # Fetch and rebase changes from remote
+                git fetch origin
+                git rebase origin/main
+                
                 git pull origin main
                 
                 pwd
