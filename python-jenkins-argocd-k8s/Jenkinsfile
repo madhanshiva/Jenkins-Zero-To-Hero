@@ -46,6 +46,16 @@ pipeline {
                 git branch: 'main', credentialsId: '928fcb9f-ddfe-408f-9685-f6b994932552', url: 'https://github.com/madhanshiva/cicd-end-to-end'
             }
         }
+        stage('Configure Git') {
+            steps {
+                script {
+                    // Set the safe directory to avoid dubious ownership issues
+                    sh '''
+                    git config --global --add safe.directory /var/lib/jenkins/workspace/new
+                    '''
+                }
+            }
+        }
         
         stage('Update K8S manifest & push to Repo') {
     steps {
