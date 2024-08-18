@@ -56,11 +56,11 @@ pipeline {
 
                 // Stash any local changes
                 
-                sh 'cd deploy'
+                
                 // Update deploy.yaml file
                 sh '''
                 
-                sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
+                sed -i "s/32/${BUILD_NUMBER}/g" deploy/deploy.yaml
                 
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
