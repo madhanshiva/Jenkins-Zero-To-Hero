@@ -55,12 +55,7 @@ pipeline {
                 
 
                 // Stash any local changes
-                sh '''
-                git stash
-                git fetch origin
-                git rebase origin/main
-                git stash pop || true
-                '''
+                
                 sh 'cd deploy'
                 // Update deploy.yaml file
                 sh '''
