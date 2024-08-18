@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: spring-boot-app
-        image: mvmadhan/ultimate-cicd:14
+        image: mvmadhan/maven-abhishek-docker-agent:14
         ports:
         - containerPort: 8080
