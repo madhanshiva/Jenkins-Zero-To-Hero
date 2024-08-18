@@ -79,11 +79,6 @@ pipeline {
                 # Fetch and rebase changes from remote
                 
                 git pull origin main
-                pwd 
-                ls
-
-                git fetch origin
-                git rebase origin/main
                 pwd
                 ls
                 git add deploy/deploy.yaml
