@@ -65,6 +65,7 @@ pipeline {
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
                 git pull origin main
+                cd deploy
                 git add deploy.yaml
                 git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
                 git remote -v
