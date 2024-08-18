@@ -70,12 +70,16 @@ pipeline {
                 // Update deploy.yaml file
                 sh '''
                 
+                pwd
+                ls
                 sed -i "s/32/${BUILD_NUMBER}/g" deploy/deploy.yaml
                 
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
                 git pull origin main
                 cd deploy
+                pwd
+                ls
                 git add deploy.yaml
                 git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
                 git remote -v
@@ -83,6 +87,7 @@ pipeline {
                 git fetch origin
                 git rebase origin/main 
                 pwd
+                ls
                 git push origin main 
                 '''
                  }
