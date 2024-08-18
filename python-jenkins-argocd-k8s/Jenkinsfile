@@ -53,6 +53,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
                         cd deploy
+
+                        git stash
+                        git pull origin main --rebase
+                        git stash pop || true
+                        
                         cat deploy.yaml
                         sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
                         cat deploy.yaml
@@ -60,9 +65,6 @@ pipeline {
                         # Configure Git with correct credentials
                         git config user.name "Madhan Shiva"
                         git config user.email "madhanshiva@example.com"
-
-                        # Pull the latest changes to avoid conflicts
-                        git pull origin main --rebase
 
                         # Add, commit, and push changes
                         git add deploy.yaml
