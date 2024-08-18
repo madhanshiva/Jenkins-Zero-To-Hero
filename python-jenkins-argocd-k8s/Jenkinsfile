@@ -52,7 +52,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId: 'github-push-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                 // Change directory to deploy
-                sh 'cd deploy'
+                
 
                 // Stash any local changes
                 sh '''
@@ -61,7 +61,7 @@ pipeline {
                 git rebase origin/main
                 git stash pop || true
                 '''
-                
+                sh 'cd deploy'
                 // Update deploy.yaml file
                 sh '''
                 
