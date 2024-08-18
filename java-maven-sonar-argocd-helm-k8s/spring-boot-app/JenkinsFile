@@ -2,26 +2,24 @@ pipeline {
   agent {
     docker {
       image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
   environment {
-    // Define environment variables at the top level if they are used across multiple stages
-    ORIGINAL_IMAGE = 'abhishekf5/maven-abhishek-docker-agent:v1'
+    ORIGINAL_IMAGE = 'mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}'
     NEW_TAG = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
   }
   stages {
     stage('Checkout') {
       steps {
         sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/madhanshiva/Jenkins-Zero-To-Hero'
-        //git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
+        // Uncomment and configure if needed
+        // git branch: 'main', url: 'https://github.com/madhanshiva/Jenkins-Zero-To-Hero'
       }
     }
     stage('Build and Test') {
       steps {
         sh 'ls -ltr'
-        // build the project and create a JAR file
         sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
       }
     }
@@ -35,27 +33,35 @@ pipeline {
         }
       }
     }
-    stage('Tag Docker Image') {
+    stage('Build Docker Image') {
+      environment {
+        DOCKER_IMAGE = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
+      }
       steps {
         script {
-          sh "docker tag ${ORIGINAL_IMAGE} ${NEW_TAG}"
+          sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
+          sh 'docker images' // Debug step to list images
         }
       }
     }
-    stage('Build and Push Docker Image') {
+    stage('Tag Docker Image') {
+      steps {
+        script {
+          sh "docker tag ${DOCKER_IMAGE} ${NEW_TAG}"
+        }
+      }
+    }
+    stage('Push Docker Images') {
       environment {
-        DOCKER_IMAGE = "mvmadhan/ultimate-cicd:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('docker_id')
       }
       steps {
         script {
-            sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
-                dockerImage.push()
-            }
-            // Push the newly tagged image
+          def dockerImage = docker.image("${DOCKER_IMAGE}")
+          docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
+            dockerImage.push()
             sh "docker push ${NEW_TAG}"
+          }
         }
       }
     }
