@@ -51,6 +51,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-push-credentials', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
+                        cd deploy
                         cat deploy.yaml
                         sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
                         cat deploy.yaml
