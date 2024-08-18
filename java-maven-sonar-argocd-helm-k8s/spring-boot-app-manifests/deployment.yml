@@ -17,5 +17,6 @@ spec:
       containers:
       - name: spring-boot-app
         image: mvmadhan/maven-abhishek-docker-agent:14
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
