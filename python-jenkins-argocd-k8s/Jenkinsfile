@@ -43,57 +43,39 @@ pipeline {
         
         stage('Checkout K8S manifest SCM') {
             steps {
-                git branch: 'main', credentialsId: '928fcb9f-ddfe-408f-9685-f6b994932552', url: 'https://github.com/madhanshiva/cicd-end-to-end'
-            }
-        }
-        stage('Configure Git') {
-            steps {
-                script {
-                    // Set the safe directory to avoid dubious ownership issues
-                    sh '''
-                    git config --global --add safe.directory /var/lib/jenkins/workspace/new
-                    '''
-                }
+                git branch: 'main', credentialsId: '928fcb9f-ddfe-408f-9685-f6b994932552', url: 'https://github.com/madhanshiva/cicd-demo-manifests-repo.git'
             }
         }
         
         stage('Update K8S manifest & push to Repo') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'github-push-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                // Change directory to deploy
-                
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'github-push-credentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh '''
+                        # Change directory to deploy
+                        cd deploy
 
-                // Stash any local changes
-                
-                
-                // Update deploy.yaml file
-                sh '''
-                
-                pwd
-                ls
-                sed -i "s/32/${BUILD_NUMBER}/g" deploy/deploy.yaml
-                
-                git config user.name "Madhan Shiva"
-                git config user.email "madhanshiva@example.com"
-                # Fetch and rebase changes from remote
-                
-                git pull origin main
-                pwd
-                ls
-                git add deploy/deploy.yaml
-                git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
-                git remote -v
-                git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
-                git fetch origin
-                 
-                pwd
-                ls
-                git push origin main 
-                '''
-                 }
+                        # Update deploy.yaml file
+                        sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
+
+                        # Configure git
+                        git config user.name "Madhan Shiva"
+                        git config user.email "madhanshiva@example.com"
+
+                        # Pull latest changes and rebase
+                        git pull origin main
+                        git fetch origin
+                        git rebase origin/main
+
+                        # Add, commit and push changes
+                        git add deploy.yaml
+                        git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
+                        git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
+                        git push origin main
+                        '''
+                    }
                 }
             }
         }
     }
-}  
+}
