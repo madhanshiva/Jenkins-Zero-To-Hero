@@ -1,9 +1,14 @@
 pipeline {
   agent {
     docker {
-     image 'abhishekf5/maven-abhishek-docker-agent:v1'
+      image 'abhishekf5/maven-abhishek-docker-agent:v1'
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
+  }
+  environment {
+    // Define environment variables at the top level if they are used across multiple stages
+    ORIGINAL_IMAGE = 'abhishekf5/maven-abhishek-docker-agent:v1'
+    NEW_TAG = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
   }
   stages {
     stage('Checkout') {
@@ -30,11 +35,7 @@ pipeline {
         }
       }
     }
-     stage('Tag Docker Image') {
-      environment {
-        ORIGINAL_IMAGE = "abhishekf5/maven-abhishek-docker-agent:v1"
-        NEW_TAG = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
-      }
+    stage('Tag Docker Image') {
       steps {
         script {
           sh "docker tag ${ORIGINAL_IMAGE} ${NEW_TAG}"
@@ -44,7 +45,6 @@ pipeline {
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "mvmadhan/ultimate-cicd:${BUILD_NUMBER}"
-        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
         REGISTRY_CREDENTIALS = credentials('docker_id')
       }
       steps {
@@ -54,32 +54,29 @@ pipeline {
             docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
                 dockerImage.push()
             }
-              // Push the newly tagged image
-            def taggedImage = docker.image("${NEW_TAG}")
-            docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
-                taggedImage.push()
-            }
+            // Push the newly tagged image
+            sh "docker push ${NEW_TAG}"
         }
       }
     }
     stage('Update Deployment File') {
-        environment {
-            GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
-            GIT_USER_NAME = "madhanshiva"
+      environment {
+        GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
+        GIT_USER_NAME = "madhanshiva"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'github-push-credentials', variable: 'GITHUB_TOKEN')]) {
+          sh '''
+            git config user.email "madhanshiva.xyz@gmail.com"
+            git config user.name "madhan shiva"
+            BUILD_NUMBER=${BUILD_NUMBER}
+            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+            git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+            git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+            git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+          '''
         }
-        steps {
-            withCredentials([string(credentialsId: 'github-push-credentials', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "madhanshiva.xyz@gmail.com"
-                    git config user.name "madhan shiva"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
-        }
+      }
     }
   }
 }
