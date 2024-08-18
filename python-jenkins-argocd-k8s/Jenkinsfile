@@ -64,7 +64,9 @@ pipeline {
                 
                 // Update deploy.yaml file
                 sh '''
-                sed -i s/32/10/g deploy.yaml
+                cat deploy.yaml
+                sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
+                cat deploy.yaml
                 git config user.name "Madhan Shiva"
                 git config user.email "madhanshiva@example.com"
                 git add deploy.yaml
