@@ -67,7 +67,10 @@ pipeline {
                 git pull origin main
                 git add deploy.yaml
                 git commit -m "Updated the deploy yaml | Jenkins Pipeline" || true
+                git remote -v
                 git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/madhanshiva/cicd-demo-manifests-repo.git
+                git fetch origin
+                git rebase origin/main || true
                 git push origin main || true
                 '''
                  }
