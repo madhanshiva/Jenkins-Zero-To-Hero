@@ -6,8 +6,9 @@ pipeline {
     }
   }
   environment {
-    ORIGINAL_IMAGE = 'mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}'
+    ORIGINAL_IMAGE = 'abhishekf5/maven-abhishek-docker-agent:v1'
     NEW_TAG = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
+    DOCKER_IMAGE = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
   }
   stages {
     stage('Checkout') {
@@ -34,9 +35,6 @@ pipeline {
       }
     }
     stage('Build Docker Image') {
-      environment {
-        DOCKER_IMAGE = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
-      }
       steps {
         script {
           sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
