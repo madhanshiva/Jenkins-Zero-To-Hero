@@ -2,7 +2,6 @@ pipeline {
   agent {
     docker {
      image 'mvmadhan/maven-abhishek-docker-agent:v1'
-     docker tag 
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
   }
