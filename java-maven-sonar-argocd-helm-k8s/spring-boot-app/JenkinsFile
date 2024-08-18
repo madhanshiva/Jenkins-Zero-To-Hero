@@ -30,6 +30,17 @@ pipeline {
         }
       }
     }
+     stage('Tag Docker Image') {
+      environment {
+        ORIGINAL_IMAGE = "abhishekf5/maven-abhishek-docker-agent:v1"
+        NEW_TAG = "mvmadhan/maven-abhishek-docker-agent:${BUILD_NUMBER}"
+      }
+      steps {
+        script {
+          sh "docker tag ${ORIGINAL_IMAGE} ${NEW_TAG}"
+        }
+      }
+    }
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "mvmadhan/ultimate-cicd:${BUILD_NUMBER}"
@@ -42,6 +53,11 @@ pipeline {
             def dockerImage = docker.image("${DOCKER_IMAGE}")
             docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
                 dockerImage.push()
+            }
+              // Push the newly tagged image
+            def taggedImage = docker.image("${NEW_TAG}")
+            docker.withRegistry('https://index.docker.io/v1/', "docker_id") {
+                taggedImage.push()
             }
         }
       }
